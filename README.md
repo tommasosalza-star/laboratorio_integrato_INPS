@@ -2,6 +2,10 @@
 
 Repository condivisa del gruppo 5 per il progetto Cloud Security & DevSecOps su AWS.
 
+## Documentazione operativa
+
+- [AWS Learner Lab — configurazione e limiti verificati](docs/LEARNER_LAB_SANDBOX.md): snapshot AWS CLI, permessi misurati in dry-run, quote e prossimi passi.
+
 ## Dipendenza applicativa
 
 OWASP Juice Shop è incluso come submodule Git in `apps/juice-shop` e fissato a una release verificata. La provenienza e la procedura di aggiornamento sono documentate in `apps/README.md`.
