@@ -12,3 +12,8 @@ output "juiceshop_private_ip" {
   description = "Private address used by the WAF reverse proxy."
   value       = aws_instance.juiceshop.private_ip
 }
+
+output "siem_private_ip" {
+  description = "Private address of the Wazuh instance."
+  value       = aws_instance.siem.private_ip
+}
