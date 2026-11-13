@@ -1,11 +1,17 @@
 resource "aws_instance" "juiceshop" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_types.juiceshop
-  subnet_id                   = aws_subnet.public.id
+  subnet_id                   = aws_subnet.private.id
   vpc_security_group_ids      = [aws_security_group.juiceshop.id]
-  iam_instance_profile        = aws_iam_instance_profile.ec2.name
+  iam_instance_profile        = "LabInstanceProfile"
   key_name                    = var.key_name
-  associate_public_ip_address = true
+  associate_public_ip_address = false
+  monitoring                  = true
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
 
   user_data = <<-EOF
     #!/bin/bash
@@ -27,9 +33,15 @@ resource "aws_instance" "waf" {
   instance_type               = var.instance_types.waf
   subnet_id                   = aws_subnet.public.id
   vpc_security_group_ids      = [aws_security_group.waf.id]
-  iam_instance_profile        = aws_iam_instance_profile.ec2.name
+  iam_instance_profile        = "LabInstanceProfile"
   key_name                    = var.key_name
   associate_public_ip_address = true
+  monitoring                  = true
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
 
   depends_on = [aws_instance.juiceshop]
 
@@ -38,7 +50,6 @@ resource "aws_instance" "waf" {
     set -eux
     apt-get update
     apt-get install -y nginx libnginx-mod-http-modsecurity
-    sed -i 's/^SecRuleEngine DetectionOnly/SecRuleEngine On/' /etc/modsecurity/modsecurity.conf
     cat >/etc/nginx/sites-available/default <<'NGINX'
     server {
       listen 80 default_server;
@@ -52,7 +63,8 @@ resource "aws_instance" "waf" {
     }
     NGINX
     nginx -t
-    systemctl enable --now nginx
+    systemctl enable nginx
+    systemctl restart nginx
   EOF
 
   tags = {
@@ -64,11 +76,23 @@ resource "aws_instance" "waf" {
 resource "aws_instance" "siem" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_types.siem
-  subnet_id                   = aws_subnet.public.id
+  subnet_id                   = aws_subnet.private.id
   vpc_security_group_ids      = [aws_security_group.siem.id]
-  iam_instance_profile        = aws_iam_instance_profile.ec2.name
+  iam_instance_profile        = "LabInstanceProfile"
   key_name                    = var.key_name
-  associate_public_ip_address = true
+  associate_public_ip_address = false
+  monitoring                  = true
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  root_block_device {
+    volume_size = 60
+    volume_type = "gp3"
+    encrypted   = true
+  }
 
   user_data = <<-EOF
     #!/bin/bash

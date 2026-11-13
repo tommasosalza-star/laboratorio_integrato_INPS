@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region where the lab will be created."
   type        = string
-  default     = "eu-west-1"
+  default     = "us-east-1"
 }
 
 variable "project_name" {
@@ -11,9 +11,9 @@ variable "project_name" {
 }
 
 variable "key_name" {
-  description = "Optional EC2 key pair name. SSM can be used when this is null."
+  description = "EC2 key pair name (nel Learner Lab esiste già: vockey)."
   type        = string
-  default     = null
+  default     = "vockey"
 }
 
 variable "admin_cidr" {
