@@ -49,6 +49,14 @@ resource "aws_security_group" "siem" {
   }
 
   ingress {
+    description     = "SSH from WAF bastion"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.waf.id]
+  }
+
+  ingress {
     description     = "Wazuh dashboard from the WAF host"
     from_port       = 443
     to_port         = 443

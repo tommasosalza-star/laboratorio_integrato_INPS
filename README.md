@@ -75,6 +75,19 @@ tofu output
 
 L'indirizzo `waf_public_ip` è il punto di ingresso per Juice Shop. Il servizio applicativo non è esposto direttamente a Internet: la porta 3000 accetta traffico soltanto dal security group del WAF.
 
+Per raggiungere il dashboard Wazuh dal computer locale senza `session-manager-plugin`, applicare prima la configurazione aggiornata e creare un tunnel SSH attraverso il WAF:
+
+```bash
+tofu apply -var='admin_cidr=IP_PUBBLICO/32' -var='key_name=NOME_KEY_PAIR'
+
+ssh -i /percorso/vockey.pem \
+	-J ubuntu@$(tofu output -raw waf_public_ip) \
+	-L 8443:localhost:443 \
+	ubuntu@$(tofu output -raw siem_private_ip)
+```
+
+Lasciare la sessione SSH aperta e visitare `https://localhost:8443`. Il certificato del dashboard Wazuh e autofirmato. La regola SSH del SIEM accetta il traffico soltanto dalla security group del WAF e dall'indirizzo amministrativo configurato.
+
 Per rimuovere tutte le risorse create dal laboratorio:
 
 ```bash
